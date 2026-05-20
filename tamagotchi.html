@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #e4bebe;
+            color: #fff;
+            text-align: center;
+            font-family: sans-serif;
+        }
+
+        img {
+            width: 200px;
+        }
+
+        p {
+            margin: 2px;
+        }
+
+        button, input {
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            background-color: #e19693;
+            color: #000;
+            margin: 5px;
+        }
+
+        ::placeholder {
+            color: #000;
+            text-align: center;
+        }
+
+        button:disabled {
+            opacity: 0.3;
+        }
+
+        #welcomeScreen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        }
+
+        #gameScreen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        display: none;
+}
+
+    
+    </style>
+    <title>Tamagotchi</title>
+</head>
+<body>
+
+<div id="welcomeScreen">
+    <img src="happy.PNG" />
+
+    <p id="greeting"></p><br />
+    <input id="nameInput" placeholder="Enter Tamagotchi Name" onkeydown="handleKey(event)">
+    <button id="submitButton" onClick="setName()">Submit</button>
+    <button id="startButton" onclick="startGame()">Start</button>
+</div>
+
+<div id="gameScreen">
+
+    <img id="happyGiraffe" src="happy.PNG" />
+    <img id="sadGiraffe" src="sad.PNG" />
+    <img id="deadGiraffe" src="dead.PNG" />
+
+    <p id="deathMessage"></p><br />
+
+    <p>Name: <span id="name"></span></p>
+    <p>Hunger: <span id="hunger"></span></p>
+    <p>Happiness: <span id="happiness"></span></p>
+    <p>Energy: <span id="energy"></span></p>
+
+    <button id="feedButton" onclick="feed()">🍕 Feed</button>
+    <button id="playButton" onclick="play()">🎮 Play</button>
+    <button id="sleepButton" onclick="sleep()">😴 Sleep</button>
+    <button id="tryAgain" onclick="tryAgain()">Try Again</button>
+
+</div>
+
+<script>
+let pet = {
+    name: "", 
+    hunger: 50,
+    happiness: 50,
+    energy: 50,
+}
+
+let isDead = false;
+let hasStarted = false;
+let nameSet = false;
+
+function startGame(){
+    hasStarted = true;
+
+    render();
+}
+
+function render() {
+    document.getElementById("name").innerText = pet.name;
+    document.getElementById("hunger").innerText = pet.hunger;
+    document.getElementById("happiness").innerText = pet.happiness;
+    document.getElementById("energy").innerText = pet.energy;
+
+    document.getElementById("tryAgain").style.display = isDead ? "block" : "none";
+    document.getElementById("startButton").style.display = hasStarted ? "none" : "block";
+
+    const buttonsDisabled = !hasStarted || isDead;
+    document.getElementById("feedButton").disabled = buttonsDisabled;
+    document.getElementById("playButton").disabled = buttonsDisabled;
+    document.getElementById("sleepButton").disabled = buttonsDisabled;
+
+    document.getElementById("gameScreen").style.display = hasStarted ? "flex" : "none";
+    document.getElementById("welcomeScreen").style.display = hasStarted ? "none" : "flex";
+
+    document.getElementById("nameInput").style.display = nameSet ? "none" : "block";
+    document.getElementById("greeting").innerText = `Hello ${pet.name}! Press Start to Play`;
+    document.getElementById("greeting").style.display = nameSet ? "block" : "none";
+    document.getElementById("startButton").style.display = nameSet ? "block" : "none";
+    document.getElementById("submitButton").style.display = nameSet ? "none" : "block";
+
+
+    document.getElementById("deathMessage").style.display = isDead ? "block" : "none";
+
+    showGiraffe();
+    checkStatus();
+
+}
+
+
+function setName() {
+    pet.name = document.getElementById("nameInput").value;
+    nameSet = true
+
+    render()
+}
+
+function handleKey(event){
+    if (event.key === "Enter"){
+    pet.name = document.getElementById("nameInput").value;
+    nameSet = true;
+    render();
+    }
+}
+
+function showGiraffe(){
+    if (isDead){
+        document.getElementById("deadGiraffe").style.display = "block";
+        document.getElementById("happyGiraffe").style.display = "none";
+        document.getElementById("sadGiraffe").style.display = "none"
+    }
+
+    else if (pet.hunger >= 70 || pet.happiness <= 30 || pet.energy <= 30) {
+        document.getElementById("deadGiraffe").style.display = "none";
+        document.getElementById("happyGiraffe").style.display = "none";
+        document.getElementById("sadGiraffe").style.display = "block"
+    }
+
+    else {
+        document.getElementById("deadGiraffe").style.display = "none";
+        document.getElementById("happyGiraffe").style.display = "block";
+        document.getElementById("sadGiraffe").style.display = "none"
+
+    }
+        
+}
+
+function feed() {
+    if (isDead) return;
+
+    pet.hunger = clamp(pet.hunger - 10, 0, 100);
+    pet.happiness = clamp(pet.happiness + 5, 0, 100);
+    pet.energy = clamp(pet.energy + 5, 0, 100);
+
+    render();
+}
+
+function play() {
+    if (isDead) return;
+
+    pet.happiness = clamp(pet.happiness + 10, 0, 100);
+    pet.hunger = clamp(pet.hunger + 5, 0, 100);
+    pet.energy = clamp(pet.energy - 10, 0, 100);
+   
+    render();
+}
+
+function sleep() {
+    if (isDead) return;
+
+    pet.energy = clamp(pet.energy + 10, 0, 100);
+    pet.hunger = clamp(pet.hunger - 5, 0, 100);
+    pet.happiness = clamp(pet.happiness - 5, 0, 100);
+
+    render();
+}
+
+function clamp(value, min, max) {
+    if (value > max) return max; 
+    if (value < min) return min;
+    return value;
+}
+
+function checkStatus(){
+    if (isDead) return;
+    if (pet.hunger >= 100 || pet.happiness <= 0 || pet.energy <= 0) {
+        isDead = true;
+    
+        document.getElementById("deathMessage").innerText = `${pet.name} has died 😢`;
+
+        render();
+    }
+}
+
+function tick() {
+    if (isDead) return;
+    if (!hasStarted) return;
+
+    pet.hunger = clamp(pet.hunger + 2, 0, 100);
+    pet.happiness = clamp(pet.happiness - 1, 0, 100);
+    pet.energy = clamp(pet.energy - 2, 0, 100);
+
+    render();
+}
+
+function tryAgain(){
+    pet.hunger = 50;
+    pet.happiness = 50;
+    pet.energy = 50;
+    isDead = false;
+    hasStarted = false;
+
+    render();
+}
+
+setInterval(tick, 5000);
+
+
+render();
+
+</script>
+
+
+
+
+
+</body>
+</html>
+
