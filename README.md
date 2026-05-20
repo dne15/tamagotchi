@@ -29,4 +29,4 @@ A browser-based virtual pet game built with HTML, CSS, and JavaScript.
 
 ## 📫 Get in Touch
 
-- GitHub: [@yourusername](https://github.com/yourusername)
+- GitHub: @dne15 (https://github.com/dne15)
