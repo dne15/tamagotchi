@@ -203,7 +203,7 @@ function sleep() {
     if (isDead) return;
 
     pet.energy = clamp(pet.energy + 10, 0, 100);
-    pet.hunger = clamp(pet.hunger - 5, 0, 100);
+    pet.hunger = clamp(pet.hunger + 5, 0, 100);
     pet.happiness = clamp(pet.happiness - 5, 0, 100);
 
     render();
