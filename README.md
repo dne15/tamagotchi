@@ -14,7 +14,7 @@ A browser-based virtual pet game built with HTML, CSS, and JavaScript.
 - Writing reusable utility functions like `clamp()`
 - Structuring a page into screens using flexbox and show/hide logic
 
-[View Project](#) <!-- replace with your GitHub Pages link -->
+[View Project](https://dne15.github.io/tamagotchi/)
 
 ---
 
